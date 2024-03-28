@@ -1,0 +1,36 @@
+////////////////////           CY.INTERCEPT             ////////////////////
+
+Para interceptar solicitudes http debemos usar el cy.intercetp.
+intercept espera diferentes parametros, GET, POST, PUT.
+
+cy.intercept()
+
+------------------------Caso de Uso 1)
+En un GET por ejemplo, podemos poner como segundo parametro el endpoint.
+
+cy.intercept("GET", endpoint)
+
+------------------------Caso de Uso 2)
+Podemos acceder a un objeto json como endpoint.
+
+const todoObject = { 
+    "title" = "NewTodoObjectFromPost",
+    "completed": false,
+    "id": "e#
+}
+
+const addTodo = todoObject =>{
+    cy.request("POST", endpoint, todoObject)
+}
+
+describe("API TESTING DEMO", ()=>{
+    it("Add a to do", ()=>{
+        addTodo(todoObject)
+
+        cy.request("GET", `${endpoint}/${todoObject.id}`)
+        .ts(`body`)
+        .should(`deep.eq`, todoObject)
+    });
+})
+
+

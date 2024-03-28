@@ -1,0 +1,108 @@
+Intro
+This tutorial will teach you the fundamentals of mocking out any HTTP API with Mirage. 
+While Mirage can be used to mock out GraphQL APIs, this tutorial will cover a basic REST API.
+
+You'll learn Mirage by mocking out the API for a Reminders app. The app is written in React, 
+but you don't need to know React to follow along since you'll only be writing Mirage code.
+
+There is no real API server running, so the app doesn't work to start. As you implement each API endpoint,
+ you'll be restoring the functionality of the app.
+
+Here's an example of the final result:
+
+https://mirage-tutorial.vercel.app/ (https://github.com/miragejs/tutorial)
+
+Setup
+Primero que nada, instalar NVM, para el controlador de version de NODE.js, esta app funciona con V 15.14.0.
+https://medium.com/devschile/m%C3%BAltiples-versiones-de-node-con-nvm-63b2ac715c38
+
+First let’s get your development environment ready. You'll need Node.js installed, and you'll be using your own text editor and terminal app.
+
+Next, download the tutorial and install its dependencies:
+
+npx degit github:miragejs/tutorial mirage-tutorial
+cd mirage-tutorial
+yarn install
+
+# You can also use npm:
+npm install
+Then open the project in your editor and start your app:
+
+yarn start
+
+# or npm run start
+This should run a development server on port 3000.
+
+Open http://localhost:3000 in your browser and you should see a page
+
+
+-------------------------------------------------------
+
+
+Part 1 – Static GET Handler
+As you can see from the interface, our Reminders app is trying to make an API request for its data, but the request is failing.
+
+Failing request
+
+That's because there's no API server for our app to talk to. Let's use Mirage to mock out the failing API request.
+
+Open the src/server.js file in your editor, import createServer from miragejs, and export a default function that creates a new server:
+
+// src/server.js
+import { createServer } from "miragejs"
+
+export default function () {
+  createServer()
+}
+We import and run this function for you in index.js but in your own apps you can wire this up however you like.
+
+Back in the app, if you open your JavaScript console, you should see an error from Mirage:
+
+Mirage: Your app tried to GET '/api/reminders', but there was no route defined to handle this request.
+
+This means Mirage is running, and that the Reminders app is making a GET request that hasn't been mocked out.
+
+We can mock it out using the routes() hook. Update the server in your app by copying in the highlighted code:
+
+import { createServer } from "miragejs"
+
+export default function () {
+  createServer({
+    routes() {
+      this.get("/api/reminders", () => ({
+        reminders: [],
+      }))
+    },
+  })
+}
+The routes() hook is how we define our route handlers, and the this.get() method lets us mock out GET requests. The first argument is the URL we're handling (/api/reminders) and the second argument is a function that responds to our app with some data.
+
+You should see the app reload and then render a message saying "All done!":
+
+All done
+
+Open the console and you'll see Mirage handled the request with a 200 status code and the object from our handler.
+
+Let's add some data to our response:
+
+createServer({
+  routes() {
+    this.get("/api/reminders", () => ({
+      reminders: [
+        { id: 1, text: "Walk the dog" },
+        { id: 2, text: "Take out the trash" },
+        { id: 3, text: "Work out" },
+      ],
+    }))
+  },
+})
+The app now renders this data.
+
+All done
+
+Congrats – you just wrote your first Mirage route handler!
+
+Takeaways
+Mirage runs in the browser, so there's no new terminal processes to manage
+Returning data from Mirage is as fast and easy as writing frontend code
+You never alter your application code to consume data from Mirage – your app thinks it's talking to a real network
